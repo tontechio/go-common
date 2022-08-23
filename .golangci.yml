@@ -1,0 +1,85 @@
+inters-settings:
+  govet:
+    check-shadowing: true
+    settings:
+      printf:
+        funcs:
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Infof
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Warnf
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Errorf
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Fatalf
+  golint:
+    min-confidence: 0
+  gocyclo:
+    min-complexity: 10
+  maligned:
+    suggest-new: true
+  dupl:
+    threshold: 100
+  goconst:
+    min-len: 2
+    min-occurrences: 2
+  depguard:
+    list-type: blacklist
+    packages:
+      # logging is allowed only by logutils.Log, logrus
+      # is allowed to use only in logutils package
+      - github.com/sirupsen/logrus
+  misspell:
+    locale: US
+  lll:
+    line-length: 240
+    tab-width: 1
+  goimports:
+    local-prefixes: github.com/tontechio/go-common
+  gocritic:
+    enabled-tags:
+      - performance
+      - style
+      - experimental
+    disabled-checks:
+      - wrapperFunc
+
+linters:
+  enable-all: true
+  disable:
+    - lll
+    - maligned
+    - prealloc
+    - gochecknoglobals
+
+run:
+  # default concurrency is a available CPU number
+  concurrency: 4
+  # timeout for analysis, e.g. 30s, 5m, default is 1m
+  deadline: 1m
+  # exit code when at least one issue was found, default is 1
+  issues-exit-code: 1
+  # include test files or not, default is true
+  tests: true
+  skip-dirs:
+    - test/testdata_etc
+    - pkg/golinters/goanalysis/(checker|passes)
+
+
+# output configuration options
+output:
+  # colored-line-number|line-number|json|tab|checkstyle|code-climate, default is "colored-line-number"
+  format: colored-line-number
+  # print lines of code with issue, default is true
+  print-issued-lines: true
+  # print linter name in the end of issue text, default is true
+  print-linter-name: true
+
+issues:
+  exclude-rules:
+    - text: "weak cryptographic primitive"
+      linters:
+        - gosec
+
+# golangci.com configuration
+# https://github.com/golangci/golangci/wiki/Configuration
+service:
+  golangci-lint-version: 1.16.x # use the fixed version to not introduce new linters unexpectedly
+  prepare:
+    - echo "here I can run custom commands, but no preparation needed for this repo"
